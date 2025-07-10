@@ -1,4 +1,4 @@
-# 🐐 Backend da Plataforma AgroTech
+# 🐐 Backend da Plataforma Kodificar - Gestão Leiteira
 
 Este é o backend de uma aplicação agropecuária moderna, desenvolvida em **Go** com o framework **Gin**, seguindo princípios de arquitetura limpa e segurança robusta com **JWT via cookies HTTP-only**.
 
