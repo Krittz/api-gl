@@ -1,0 +1,121 @@
+@startuml
+!theme reddress-darkblue
+' Diagrama UML para o módulo de Usuários do Sistema de Gestão de Pecuária Leiteira
+
+' Configurações gerais
+
+skinparam classFontSize 16
+skinparam classAttributeIconSize 10
+skinparam classBackgroundColor #18181B
+
+skinparam noteFontSize 14
+skinparam noteBorderColor #ffffff
+skinparam noteBackgroundColor #27272A
+
+skinparam defaultFontName "Segoe UI"
+skinparam ArrowFontSize 14
+skinparam roundcorner 10
+skinparam linetype polyline
+skinparam dpi 150
+
+skinparam packageStyle rectangle
+skinparam padding 10
+skinparam classBorderThickness 1.5
+
+skinparam arrowColor #ffffff
+skinparam backgroundColor #09090B
+
+skinparam circledCharacterFontSize 14
+skinparam circledCharacterRadius 12
+
+left to right direction
+
+
+' ==============================
+'  Backend Classes
+' ==============================
+
+class User {
++int id
++string email
+-string password
++string name
+}
+
+class UserRepository {
++CreateUser(user User): error
++GetUserByEmail(email string): (User, error)
++GetUserByID(id int): (User, error)
+}
+
+class UserService {
++Register(email string, password string, name string): (User, error)
++Login(email string, password string): (string, error)
++GetProfile(userID int): (User, error)
+-hashPassword(password string): (string, error)
+-verifyPassword(hashed string, password string): error
+-generateJWT(userID int): (string, error)
+}
+
+class UserHandler {
++RegisterHandler(c *gin.Context)
++LoginHandler(c *gin.Context)
++GetProfileHandler(c *gin.Context)
+}
+
+' ==============================
+'  Banco de Dados
+' ==============================
+
+entity "MySQL (users table)" as MySQL {
+*id : INT <<PK>>  ' Chave primária
+.. Campos do usuário ..
+email : VARCHAR(255) <<UNIQUE>>
+password : VARCHAR(255)
+name : VARCHAR(255)
+}
+
+' ==============================
+'  Relacionamentos
+' ==============================
+
+UserRepository --> MySQL : CRUD
+UserService --> UserRepository : uses
+UserHandler --> UserService : uses
+UserHandler --> User : manipulates
+Axios --> UserHandler : HTTP requests
+
+' ==============================
+'  Notas Explicativas
+' ==============================
+
+note right of User
+Entidade representando um usuário.
+Senha é armazenada criptografada (bcrypt).
+end note
+
+note right of UserRepository
+Interface para acesso ao banco MySQL.
+Contém métodos CRUD para a tabela users.
+end note
+
+note right of UserService
+Contém regras de negócio:
+- Validação de e-mail/senha
+- Criptografia de senha (bcrypt)
+- Geração de JWT
+end note
+
+note right of UserHandler
+Endpoints RESTful:
+- POST /auth/register
+- POST /auth/login
+- GET /users/me (protegido)
+end note
+
+note left of [Axios]
+Comunicação com a API via requisições HTTP.
+Envia cookies HTTP-only com JWT.
+end note
+
+@enduml
